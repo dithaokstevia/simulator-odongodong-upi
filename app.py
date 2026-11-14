@@ -15,8 +15,11 @@ st.set_page_config(
 )
 
 st.title("🚌 Simulator Parametrik Rute & Penjadwalan Odong-Odong UPI")
-st.caption("Kelompok 6 - Ditha Okstevia, Eisha Karima Fidareini, Nailah Amani Nuryaman, Nesa Dwi Rizqi Marsha Reneta- Proyek MSTR Kampus UPI Silihwangi 2026 (Presisi 9 Halte & Sesi Operasional Dinamis)")
+st.caption("Kelompok 6 - Proyek MSTR Kampus UPI Silihwangi 2026 (Presisi 9 Halte & Sesi Operasional Dinamis)")
 st.markdown("---")
+
+# Data Nama 9 Halte Singkat Presisi
+list_halte = ["FPTI", "FIP", "FPMIPA", "FPOK", "FK", "FPEB", "FPSD", "FPBS", "FPIPS"]
 
 # ---------------------------------------------------------
 # 2. SIDEBAR: PANEL KONTROL PARAMETER OPERASIONAL & SESI
@@ -72,37 +75,56 @@ else:
     durasi_sesi_menit = (t_selesai_dt - t_mulai_dt).total_seconds() / 60.0
 
 # ---------------------------------------------------------
-# 3. PANEL SUPIR: INPUT KURSI TERISI & RINCIAN HALTE TURUN
+# 3. PANEL SUPIR: INPUT POSISI LEG, KURSI TERISI & HALTE TURUN
 # ---------------------------------------------------------
 st.sidebar.markdown("---")
-st.sidebar.header("👨‍✈️ Panel Supir: Input Kursi & Halte Turun")
+st.sidebar.header("👨‍✈️ Panel Supir: Input Real-Time")
 
-list_halte_short = ["FPTI", "FIP", "FPMIPA", "FPOK", "FK", "FPEB", "FPSD", "FPBS", "FPIPS"]
-
-# Input Odong 1
+# Input Supir Odong 1
 st.sidebar.subheader("🚌 Odong 1 (Start: FPTI)")
+pilihan_leg_o1 = st.sidebar.selectbox(
+    "Posisi Leg Jalan Odong 1 Saat Ini:", 
+    options=list(range(9)), 
+    index=0,
+    format_func=lambda x: f"Leg {x+1}: {list_halte[x]} -> {list_halte[(x+1)%9]}",
+    key="sb_leg_o1"
+)
 terisi_o1 = st.sidebar.number_input("Kursi Terisi Saat Ini (Odong 1):", 0, kapasitas_maks, 10, key="t_o1")
 turun_o1 = {}
 with st.sidebar.expander("📍 Rincian Halte Turun Penumpang (Odong 1)"):
-    for idx, h_short in enumerate(list_halte_short):
+    for idx, h_short in enumerate(list_halte):
         def_val = 3 if h_short == "FPMIPA" else (2 if h_short == "FPEB" else 0)
         turun_o1[h_short] = st.number_input(f"Turun di {h_short}:", 0, terisi_o1, def_val, key=f"turun_o1_{idx}")
 
-# Input Odong 2
+# Input Supir Odong 2
 st.sidebar.subheader("🚌 Odong 2 (Start: FPMIPA)")
+pilihan_leg_o2 = st.sidebar.selectbox(
+    "Posisi Leg Jalan Odong 2 Saat Ini:", 
+    options=list(range(9)), 
+    index=2,
+    format_func=lambda x: f"Leg {x+1}: {list_halte[x]} -> {list_halte[(x+1)%9]}",
+    key="sb_leg_o2"
+)
 terisi_o2 = st.sidebar.number_input("Kursi Terisi Saat Ini (Odong 2):", 0, kapasitas_maks, 8, key="t_o2")
 turun_o2 = {}
 with st.sidebar.expander("📍 Rincian Halte Turun Penumpang (Odong 2)"):
-    for idx, h_short in enumerate(list_halte_short):
+    for idx, h_short in enumerate(list_halte):
         def_val = 4 if h_short == "FK" else 0
         turun_o2[h_short] = st.number_input(f"Turun di {h_short}:", 0, terisi_o2, def_val, key=f"turun_o2_{idx}")
 
-# Input Odong 3
+# Input Supir Odong 3
 st.sidebar.subheader("🚌 Odong 3 (Start: FPEB)")
+pilihan_leg_o3 = st.sidebar.selectbox(
+    "Posisi Leg Jalan Odong 3 Saat Ini:", 
+    options=list(range(9)), 
+    index=5,
+    format_func=lambda x: f"Leg {x+1}: {list_halte[x]} -> {list_halte[(x+1)%9]}",
+    key="sb_leg_o3"
+)
 terisi_o3 = st.sidebar.number_input("Kursi Terisi Saat Ini (Odong 3):", 0, kapasitas_maks, 4, key="t_o3")
 turun_o3 = {}
 with st.sidebar.expander("📍 Rincian Halte Turun Penumpang (Odong 3)"):
-    for idx, h_short in enumerate(list_halte_short):
+    for idx, h_short in enumerate(list_halte):
         def_val = 2 if h_short == "FPTI" else 0
         turun_o3[h_short] = st.number_input(f"Turun di {h_short}:", 0, terisi_o3, def_val, key=f"turun_o3_{idx}")
 
@@ -113,20 +135,9 @@ sisa_o3 = kapasitas_maks - terisi_o3
 # ---------------------------------------------------------
 # 4. TABEL MATRIKS JARAK DINAMIS (9 LEG)
 # ---------------------------------------------------------
-st.subheader("1️⃣ Matriks Jarak Antar-Halte Tetap 9 Fakultas Utama")
+st.subheader("1️⃣ Matriks Jarak Antar-Halte Tetap 9 Fakultas Utama (Dapat Diedit)")
 
-leg_list = [
-    "Leg 1: Halte 1 (FPTI) -> Halte 2 (FIP)",
-    "Leg 2: Halte 2 (FIP) -> Halte 3 (FPMIPA)",
-    "Leg 3: Halte 3 (FPMIPA) -> Halte 4 (FPOK)",
-    "Leg 4: Halte 4 (FPOK) -> Halte 5 (FK)",
-    "Leg 5: Halte 5 (FK) -> Halte 6 (FPEB)",
-    "Leg 6: Halte 6 (FPEB) -> Halte 7 (FPSD)",
-    "Leg 7: Halte 7 (FPSD) -> Halte 8 (FPBS)",
-    "Leg 8: Halte 8 (FPBS) -> Halte 9 (FPIPS)",
-    "Leg 9: Halte 9 (FPIPS) -> Halte 1 (FPTI)"
-]
-
+leg_list = [f"Leg {i+1}: {list_halte[i]} -> {list_halte[(i+1)%9]}" for i in range(9)]
 jarak_list_baru = [320, 120, 327, 120, 150, 130, 160, 230, 180]
 
 data_jarak = {
@@ -222,34 +233,14 @@ with m_col3:
 st.markdown("---")
 
 # ---------------------------------------------------------
-# 7. ANIMASI PERGERAKAN 3 TITIK (ODONG 1, ODONG 2, ODONG 3)
+# 7. ANIMASI PERGERAKAN 3 TITIK (MENGIKUTI INPUT SUPIR IN SIDEBAR)
 # ---------------------------------------------------------
 st.subheader("🎬 Visualisasi Animasi Pergerakan 3 Armada Odong-Odong (Titik A -> Titik B)")
-st.write("Pilih tab di bawah untuk melihat pergerakan live dari Titik Halte Asal ke Titik Halte Tujuan masing-masing Odong-Odong:")
+st.write("Tampilan animasi di bawah **secara otomatis bergerak sesuai posisi Leg Perjalanan yang diinput supir di Panel Sidebar**:")
 
-halte_asal_list = [
-    "Halte 1: FPTI (Gerbang Bawah)", "Halte 2: FIP Baru", "Halte 3: FPMIPA (JICA)",
-    "Halte 4: FPOK Utama", "Halte 5: FK (Kedokteran)", "Halte 6: FPEB Utama",
-    "Halte 7: FPSD Utama", "Halte 8: FPBS (ATM Center)", "Halte 9: FPIPS Utama"
-]
-
-halte_tujuan_list = [
-    "Halte 2: FIP Baru", "Halte 3: FPMIPA (JICA)", "Halte 4: FPOK Utama",
-    "Halte 5: FK (Kedokteran)", "Halte 6: FPEB Utama", "Halte 7: FPSD Utama",
-    "Halte 8: FPBS (ATM Center)", "Halte 9: FPIPS Utama", "Halte 1: FPTI (Gerbang Bawah)"
-]
-
-def render_anim_odong(odong_label, default_leg_idx, border_color):
-    pilihan_leg_anim = st.selectbox(
-        f"Pilih Leg Perjalanan {odong_label}:", 
-        options=list(range(9)), 
-        index=default_leg_idx,
-        format_func=lambda x: f"Leg {x+1}: {halte_asal_list[x]} -> {halte_tujuan_list[x]}",
-        key=f"select_leg_{odong_label}"
-    )
-
-    nama_asal = halte_asal_list[pilihan_leg_anim]
-    nama_tujuan = halte_tujuan_list[pilihan_leg_anim]
+def render_anim_odong_direct(pilihan_leg_anim, border_color):
+    nama_asal = list_halte[pilihan_leg_anim]
+    nama_tujuan = list_halte[(pilihan_leg_anim + 1) % 9]
     jarak_leg = df_edited.iloc[pilihan_leg_anim]["Estimasi Jarak (Meter)"]
     waktu_jalan_leg = df_edited.iloc[pilihan_leg_anim]["Waktu Jalan (Menit)"]
 
@@ -277,9 +268,9 @@ def render_anim_odong(odong_label, default_leg_idx, border_color):
     <body>
     <div class="anim-container">
         <div class="nodes-wrapper">
-            <div class="node-box">📍 TITIK ASAL<br><span style="color: #38bdf8; font-size: 15px;">{nama_asal}</span></div>
+            <div class="node-box">📍 TITIK ASAL<br><span style="color: #38bdf8; font-size: 15px;">Halte {nama_asal}</span></div>
             <div style="text-align: center;"><span class="info-badge">📏 {jarak_leg} Meter | ⏱️ {waktu_jalan_leg} Menit</span></div>
-            <div class="node-box">🏁 TITIK TUJUAN<br><span style="color: #4ade80; font-size: 15px;">{nama_tujuan}</span></div>
+            <div class="node-box">🏁 TITIK TUJUAN<br><span style="color: #4ade80; font-size: 15px;">Halte {nama_tujuan}</span></div>
         </div>
         <div class="track-line"><div class="car-icon">🚌</div></div>
     </div>
@@ -295,13 +286,16 @@ anim_tab1, anim_tab2, anim_tab3 = st.tabs([
 ])
 
 with anim_tab1:
-    render_anim_odong("Odong_1", 0, "#38bdf8")
+    st.info(f"📍 Leg Perjalanan Odong 1 Saat Ini (Input Supir): **Leg {pilihan_leg_o1+1}: {list_halte[pilihan_leg_o1]} ➔ {list_halte[(pilihan_leg_o1+1)%9]}**")
+    render_anim_odong_direct(pilihan_leg_o1, "#38bdf8")
 
 with anim_tab2:
-    render_anim_odong("Odong_2", 2, "#f59e0b")
+    st.info(f"📍 Leg Perjalanan Odong 2 Saat Ini (Input Supir): **Leg {pilihan_leg_o2+1}: {list_halte[pilihan_leg_o2]} ➔ {list_halte[(pilihan_leg_o2+1)%9]}**")
+    render_anim_odong_direct(pilihan_leg_o2, "#f59e0b")
 
 with anim_tab3:
-    render_anim_odong("Odong_3", 5, "#10b981")
+    st.info(f"📍 Leg Perjalanan Odong 3 Saat Ini (Input Supir): **Leg {pilihan_leg_o3+1}: {list_halte[pilihan_leg_o3]} ➔ {list_halte[(pilihan_leg_o3+1)%9]}**")
+    render_anim_odong_direct(pilihan_leg_o3, "#10b981")
 
 st.markdown("---")
 
@@ -310,24 +304,18 @@ st.markdown("---")
 # ---------------------------------------------------------
 st.subheader("3️⃣ Tabel Jadwal Presisi Kedatangan di Setiap Halte (Timetable Dinamis Sesi)")
 
-halte_names = [
-    "Halte 1 (FPTI)", "Halte 2 (FIP)", "Halte 3 (FPMIPA)",
-    "Halte 4 (FPOK)", "Halte 5 (FK)", "Halte 6 (FPEB)",
-    "Halte 7 (FPSD)", "Halte 8 (FPBS)", "Halte 9 (FPIPS)"
-]
-
 leg_durations = df_edited["Total Waktu Leg (Menit)"].tolist()
 
 def build_timetable_sesi(start_halte_idx, start_dt, end_dt):
     rows = []
-    num_haltes = len(halte_names)
+    num_haltes = len(list_halte)
     curr_dt = start_dt
     trip_count = 1
     
     while curr_dt <= end_dt:
         for step in range(num_haltes):
             h_idx = (start_halte_idx + step) % num_haltes
-            h_name = halte_names[h_idx]
+            h_name = f"Halte {list_halte[h_idx]}"
             
             if curr_dt <= end_dt:
                 rows.append({
@@ -342,7 +330,7 @@ def build_timetable_sesi(start_halte_idx, start_dt, end_dt):
             curr_dt += datetime.timedelta(minutes=dur)
             
         if curr_dt <= end_dt:
-            origin_name = halte_names[start_halte_idx]
+            origin_name = f"Halte {list_halte[start_halte_idx]}"
             rows.append({
                 "Putaran / Trip": f"Trip {trip_count} (Selesai)",
                 "Nama Halte Singgah": f"Kembali ke {origin_name}",
@@ -356,9 +344,9 @@ def build_timetable_sesi(start_halte_idx, start_dt, end_dt):
     return pd.DataFrame(rows)
 
 tab1, tab2, tab3 = st.tabs([
-    "🚌 Odong 1 (Start: Halte 1 FPTI)",
-    "🚌 Odong 2 (Start: Halte 3 FPMIPA)",
-    "🚌 Odong 3 (Start: Halte 6 FPEB)"
+    "🚌 Odong 1 (Start: Halte FPTI)",
+    "🚌 Odong 2 (Start: Halte FPMIPA)",
+    "🚌 Odong 3 (Start: Halte FPEB)"
 ])
 
 with tab1:
@@ -384,13 +372,7 @@ st.subheader("4️⃣ Visualisasi Peta Titik Penanda 9 Halte Tetap Kampus UPI")
 st.write("Peta di bawah **hanya menampilkan titik penanda 9 halte (tanpa garis)**:")
 
 data_koordinat_awal = {
-    "Nama Halte": [
-        "Halte 1: FPTI", "Halte 2: FIP Baru",
-        "Halte 3: FPMIPA", "Halte 4: FPOK",
-        "Halte 5: FK", "Halte 6: FPEB",
-        "Halte 7: FPSD", "Halte 8: FPBS",
-        "Halte 9: FPIPS"
-    ],
+    "Nama Halte": [f"Halte {h}" for h in list_halte],
     "Latitude": [-6.8637, -6.8617, -6.8620, -6.8610, -6.8608, -6.8603, -6.8602, -6.8606, -6.8613],
     "Longitude": [107.5925, 107.5911, 107.5904, 107.5900, 107.5912, 107.5925, 107.5933, 107.5940, 107.5927],
     "Warna Icon": ["blue", "green", "red", "darkred", "cadetblue", "orange", "darkgreen", "darkblue", "purple"]
