@@ -72,20 +72,43 @@ else:
     durasi_sesi_menit = (t_selesai_dt - t_mulai_dt).total_seconds() / 60.0
 
 # ---------------------------------------------------------
-# 3. PANEL PENGURUS/SUPIR: INPUT STATUS KETERISIAN KURSI
+# 3. PANEL SUPIR: INPUT KURSI TERISI & RINCIAN HALTE TURUN
 # ---------------------------------------------------------
 st.sidebar.markdown("---")
-st.sidebar.header("👨‍✈️ Panel Pengurus / Supir (Input Kursi)")
+st.sidebar.header("👨‍✈️ Panel Supir: Input Kursi & Halte Turun")
 
-terisi_o1 = st.sidebar.number_input("Odong 1 - Kursi Terisi:", min_value=0, max_value=kapasitas_maks, value=6, step=1)
-terisi_o2 = st.sidebar.number_input("Odong 2 - Kursi Terisi:", min_value=0, max_value=kapasitas_maks, value=9, step=1)
-terisi_o3 = st.sidebar.number_input("Odong 3 - Kursi Terisi:", min_value=0, max_value=kapasitas_maks, value=3, step=1)
+list_halte_short = ["FPTI", "FIP", "FPMIPA", "FPOK", "FK", "FPEB", "FPSD", "FPBS", "FPIPS"]
+
+# Input Odong 1
+st.sidebar.subheader("🚌 Odong 1 (Start: FPTI)")
+terisi_o1 = st.sidebar.number_input("Kursi Terisi Saat Ini (Odong 1):", 0, kapasitas_maks, 10, key="t_o1")
+turun_o1 = {}
+with st.sidebar.expander("📍 Rincian Halte Turun Penumpang (Odong 1)"):
+    for idx, h_short in enumerate(list_halte_short):
+        def_val = 3 if h_short == "FPMIPA" else (2 if h_short == "FPEB" else 0)
+        turun_o1[h_short] = st.number_input(f"Turun di {h_short}:", 0, terisi_o1, def_val, key=f"turun_o1_{idx}")
+
+# Input Odong 2
+st.sidebar.subheader("🚌 Odong 2 (Start: FPMIPA)")
+terisi_o2 = st.sidebar.number_input("Kursi Terisi Saat Ini (Odong 2):", 0, kapasitas_maks, 8, key="t_o2")
+turun_o2 = {}
+with st.sidebar.expander("📍 Rincian Halte Turun Penumpang (Odong 2)"):
+    for idx, h_short in enumerate(list_halte_short):
+        def_val = 4 if h_short == "FK" else 0
+        turun_o2[h_short] = st.number_input(f"Turun di {h_short}:", 0, terisi_o2, def_val, key=f"turun_o2_{idx}")
+
+# Input Odong 3
+st.sidebar.subheader("🚌 Odong 3 (Start: FPEB)")
+terisi_o3 = st.sidebar.number_input("Kursi Terisi Saat Ini (Odong 3):", 0, kapasitas_maks, 4, key="t_o3")
+turun_o3 = {}
+with st.sidebar.expander("📍 Rincian Halte Turun Penumpang (Odong 3)"):
+    for idx, h_short in enumerate(list_halte_short):
+        def_val = 2 if h_short == "FPTI" else 0
+        turun_o3[h_short] = st.number_input(f"Turun di {h_short}:", 0, terisi_o3, def_val, key=f"turun_o3_{idx}")
 
 sisa_o1 = kapasitas_maks - terisi_o1
 sisa_o2 = kapasitas_maks - terisi_o2
 sisa_o3 = kapasitas_maks - terisi_o3
-
-st.sidebar.info("💡 **Petunjuk**: Pengurus/supir dapat mengubah angka 'Kursi Terisi' di sidebar untuk memperbarui tampilan keterisian di layar secara live.")
 
 # ---------------------------------------------------------
 # 4. TABEL MATRIKS JARAK DINAMIS (9 LEG)
@@ -125,7 +148,7 @@ df_jarak = pd.DataFrame(data_jarak)
 df_edited = st.data_editor(df_jarak, num_rows="fixed", use_container_width=True, key="editor_jarak_clean")
 
 # ---------------------------------------------------------
-# 5. ENGINE KALKULASI MATEMATIKA PVRTP & DASHBOARD KURSI
+# 5. ENGINE KALKULASI MATEMATIKA PVRTP
 # ---------------------------------------------------------
 kecepatan_m_min = (kecepatan_kmjam * 1000) / 60.0
 df_edited["Waktu Jalan (Menit)"] = (df_edited["Estimasi Jarak (Meter)"] / kecepatan_m_min).round(2)
@@ -155,67 +178,78 @@ with col4:
 with col5:
     st.metric("Total Putaran Sesi", f"{total_putaran_sesi:.2f} Putaran")
 
-# TAMPILAN STATUS KETERISIAN KURSI ARMADA REAL-TIME
-st.markdown("### 💺 Status Keterisian Kursi Armada Real-Time (Input Pengurus / Supir)")
+# ---------------------------------------------------------
+# 6. STATUS KETERISIAN KURSI & RINCIAN TURUN PER HALTE
+# ---------------------------------------------------------
+st.markdown("### 💺 Status Keterisian Kursi & Rincian Penumpang Turun per Halte")
 m_col1, m_col2, m_col3 = st.columns(3)
 
 with m_col1:
     st.subheader("🚌 Odong 1 (Start: FPTI)")
-    st.metric("Kursi Terisi", f"{terisi_o1} / {kapasitas_maks} Orang", delta=f"Sisa {sisa_o1} Kursi Kosong")
+    st.metric("Kursi Terisi", f"{terisi_o1} / {kapasitas_maks} Orang", delta=f"Sisa {sisa_o1} Kursi Langsung Kosong")
     st.progress(terisi_o1 / kapasitas_maks)
     if terisi_o1 >= kapasitas_maks:
-        st.error("⚠️ STATUS: KURSI PENUH (100%)")
+        st.error("⚠️ STATUS: KABIN PENUH SAAT INI")
     else:
-        st.success(f"✅ STATUS: TERSEDIA {sisa_o1} KURSI")
+        st.success(f"✅ STATUS: TERSEDIA {sisa_o1} KURSI LANGSUNG")
+    
+    st.markdown("**📍 Rincian Penumpang Akan Turun di Halte:**")
+    df_t1 = pd.DataFrame([{"Halte Tujuan": k, "Jumlah Turun (Orang)": v} for k, v in turun_o1.items() if v > 0])
+    if not df_t1.empty:
+        st.dataframe(df_t1, use_container_width=True, hide_index=True)
+    else:
+        st.caption("Belum ada rincian halte turun diinput supir.")
 
 with m_col2:
     st.subheader("🚌 Odong 2 (Start: FPMIPA)")
-    st.metric("Kursi Terisi", f"{terisi_o2} / {kapasitas_maks} Orang", delta=f"Sisa {sisa_o2} Kursi Kosong")
+    st.metric("Kursi Terisi", f"{terisi_o2} / {kapasitas_maks} Orang", delta=f"Sisa {sisa_o2} Kursi Langsung Kosong")
     st.progress(terisi_o2 / kapasitas_maks)
     if terisi_o2 >= kapasitas_maks:
-        st.error("⚠️ STATUS: KURSI PENUH (100%)")
+        st.error("⚠️ STATUS: KABIN PENUH SAAT INI")
     else:
-        st.success(f"✅ STATUS: TERSEDIA {sisa_o2} KURSI")
+        st.success(f"✅ STATUS: TERSEDIA {sisa_o2} KURSI LANGSUNG")
+    
+    st.markdown("**📍 Rincian Penumpang Akan Turun di Halte:**")
+    df_t2 = pd.DataFrame([{"Halte Tujuan": k, "Jumlah Turun (Orang)": v} for k, v in turun_o2.items() if v > 0])
+    if not df_t2.empty:
+        st.dataframe(df_t2, use_container_width=True, hide_index=True)
+    else:
+        st.caption("Belum ada rincian halte turun diinput supir.")
 
 with m_col3:
     st.subheader("🚌 Odong 3 (Start: FPEB)")
-    st.metric("Kursi Terisi", f"{terisi_o3} / {kapasitas_maks} Orang", delta=f"Sisa {sisa_o3} Kursi Kosong")
+    st.metric("Kursi Terisi", f"{terisi_o3} / {kapasitas_maks} Orang", delta=f"Sisa {sisa_o3} Kursi Langsung Kosong")
     st.progress(terisi_o3 / kapasitas_maks)
     if terisi_o3 >= kapasitas_maks:
-        st.error("⚠️ STATUS: KURSI PENUH (100%)")
+        st.error("⚠️ STATUS: KABIN PENUH SAAT INI")
     else:
-        st.success(f"✅ STATUS: TERSEDIA {sisa_o3} KURSI")
+        st.success(f"✅ STATUS: TERSEDIA {sisa_o3} KURSI LANGSUNG")
+    
+    st.markdown("**📍 Rincian Penumpang Akan Turun di Halte:**")
+    df_t3 = pd.DataFrame([{"Halte Tujuan": k, "Jumlah Turun (Orang)": v} for k, v in turun_o3.items() if v > 0])
+    if not df_t3.empty:
+        st.dataframe(df_t3, use_container_width=True, hide_index=True)
+    else:
+        st.caption("Belum ada rincian halte turun diinput supir.")
 
 st.markdown("---")
 
 # ---------------------------------------------------------
-# 6. ANIMASI PERGERAKAN 2 TITIK (COMPONENTS.HTML)
+# 7. ANIMASI PERGERAKAN 2 TITIK (COMPONENTS.HTML)
 # ---------------------------------------------------------
 st.subheader("🎬 Visualisasi Animasi Pergerakan Odong-Odong (Titik A -> Titik B)")
 st.write("Pilih ruas perjalanan (leg) di bawah untuk melihat animasi pergerakan mobil odong-odong meluncur & bergoyang dari halte asal ke halte tujuan:")
 
 halte_asal_list = [
-    "Halte 1: FPTI (Gerbang Bawah)",
-    "Halte 2: FIP Baru",
-    "Halte 3: FPMIPA (JICA)",
-    "Halte 4: FPOK Utama",
-    "Halte 5: FK (Kedokteran)",
-    "Halte 6: FPEB Utama",
-    "Halte 7: FPSD Utama",
-    "Halte 8: FPBS (ATM Center)",
-    "Halte 9: FPIPS Utama"
+    "Halte 1: FPTI (Gerbang Bawah)", "Halte 2: FIP Baru", "Halte 3: FPMIPA (JICA)",
+    "Halte 4: FPOK Utama", "Halte 5: FK (Kedokteran)", "Halte 6: FPEB Utama",
+    "Halte 7: FPSD Utama", "Halte 8: FPBS (ATM Center)", "Halte 9: FPIPS Utama"
 ]
 
 halte_tujuan_list = [
-    "Halte 2: FIP Baru",
-    "Halte 3: FPMIPA (JICA)",
-    "Halte 4: FPOK Utama",
-    "Halte 5: FK (Kedokteran)",
-    "Halte 6: FPEB Utama",
-    "Halte 7: FPSD Utama",
-    "Halte 8: FPBS (ATM Center)",
-    "Halte 9: FPIPS Utama",
-    "Halte 1: FPTI (Gerbang Bawah)"
+    "Halte 2: FIP Baru", "Halte 3: FPMIPA (JICA)", "Halte 4: FPOK Utama",
+    "Halte 5: FK (Kedokteran)", "Halte 6: FPEB Utama", "Halte 7: FPSD Utama",
+    "Halte 8: FPBS (ATM Center)", "Halte 9: FPIPS Utama", "Halte 1: FPTI (Gerbang Bawah)"
 ]
 
 pilihan_leg_anim = st.selectbox(
@@ -235,106 +269,30 @@ html_anim_code = f"""
 <head>
 <style>
 @keyframes moveAndShake {{
-    0% {{
-        left: 2%;
-        transform: translateY(0px) rotate(0deg);
-    }}
-    25% {{
-        transform: translateY(-4px) rotate(-3deg);
-    }}
-    50% {{
-        transform: translateY(3px) rotate(3deg);
-    }}
-    75% {{
-        transform: translateY(-3px) rotate(-2deg);
-    }}
-    100% {{
-        left: 88%;
-        transform: translateY(0px) rotate(0deg);
-    }}
+    0% {{ left: 2%; transform: translateY(0px) rotate(0deg); }}
+    25% {{ transform: translateY(-4px) rotate(-3deg); }}
+    50% {{ transform: translateY(3px) rotate(3deg); }}
+    75% {{ transform: translateY(-3px) rotate(-2deg); }}
+    100% {{ left: 88%; transform: translateY(0px) rotate(0deg); }}
 }}
 
-body {{
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}}
-
-.anim-container {{
-    background: linear-gradient(135deg, #1e293b, #0f172a);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    color: white;
-    border: 1px solid #334155;
-}}
-
-.nodes-wrapper {{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}}
-
-.node-box {{
-    background: #334155;
-    padding: 10px 16px;
-    border-radius: 12px;
-    border: 2px solid #38bdf8;
-    font-weight: bold;
-    font-size: 14px;
-    width: 38%;
-    text-align: center;
-}}
-
-.track-line {{
-    position: relative;
-    height: 12px;
-    background: #475569;
-    border-radius: 6px;
-    margin: 35px 10px 15px 10px;
-    border: 1px dashed #94a3b8;
-}}
-
-.car-icon {{
-    position: absolute;
-    top: -26px;
-    font-size: 34px;
-    animation: moveAndShake 3.5s infinite linear;
-    filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4));
-}}
-
-.info-badge {{
-    text-align: center;
-    background: #0284c7;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    display: inline-block;
-}}
+body {{ margin: 0; padding: 0; background: transparent; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }}
+.anim-container {{ background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 16px; padding: 20px; color: white; border: 1px solid #334155; }}
+.nodes-wrapper {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }}
+.node-box {{ background: #334155; padding: 10px 16px; border-radius: 12px; border: 2px solid #38bdf8; font-weight: bold; font-size: 14px; width: 38%; text-align: center; }}
+.track-line {{ position: relative; height: 12px; background: #475569; border-radius: 6px; margin: 35px 10px 15px 10px; border: 1px dashed #94a3b8; }}
+.car-icon {{ position: absolute; top: -26px; font-size: 34px; animation: moveAndShake 3.5s infinite linear; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4)); }}
+.info-badge {{ text-align: center; background: #0284c7; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-block; }}
 </style>
 </head>
 <body>
 <div class="anim-container">
     <div class="nodes-wrapper">
-        <div class="node-box">
-            📍 TITIK ASAL<br>
-            <span style="color: #38bdf8; font-size: 15px;">{nama_asal}</span>
-        </div>
-        <div style="text-align: center;">
-            <span class="info-badge">📏 {jarak_leg} Meter | ⏱️ {waktu_jalan_leg} Menit</span>
-        </div>
-        <div class="node-box">
-            🏁 TITIK TUJUAN<br>
-            <span style="color: #4ade80; font-size: 15px;">{nama_tujuan}</span>
-        </div>
+        <div class="node-box">📍 TITIK ASAL<br><span style="color: #38bdf8; font-size: 15px;">{nama_asal}</span></div>
+        <div style="text-align: center;"><span class="info-badge">📏 {jarak_leg} Meter | ⏱️ {waktu_jalan_leg} Menit</span></div>
+        <div class="node-box">🏁 TITIK TUJUAN<br><span style="color: #4ade80; font-size: 15px;">{nama_tujuan}</span></div>
     </div>
-    
-    <div class="track-line">
-        <div class="car-icon">🚌</div>
-    </div>
+    <div class="track-line"><div class="car-icon">🚌</div></div>
 </div>
 </body>
 </html>
@@ -344,20 +302,14 @@ components.html(html_anim_code, height=210)
 st.markdown("---")
 
 # ---------------------------------------------------------
-# 7. TABEL JADWAL PRESISI WAKTU KEDATANGAN
+# 8. TABEL JADWAL PRESISI WAKTU KEDATANGAN
 # ---------------------------------------------------------
 st.subheader("3️⃣ Tabel Jadwal Presisi Kedatangan di Setiap Halte (Timetable Dinamis Sesi)")
 
 halte_names = [
-    "Halte 1 (FPTI - Gerbang Bawah)",
-    "Halte 2 (FIP Baru)",
-    "Halte 3 (FPMIPA - JICA)",
-    "Halte 4 (FPOK Utama)",
-    "Halte 5 (FK Kedokteran)",
-    "Halte 6 (FPEB Utama)",
-    "Halte 7 (FPSD Utama)",
-    "Halte 8 (FPBS / ATM Center)",
-    "Halte 9 (FPIPS Utama)"
+    "Halte 1 (FPTI - Gerbang Bawah)", "Halte 2 (FIP Baru)", "Halte 3 (FPMIPA - JICA)",
+    "Halte 4 (FPOK Utama)", "Halte 5 (FK Kedokteran)", "Halte 6 (FPEB Utama)",
+    "Halte 7 (FPSD Utama)", "Halte 8 (FPBS / ATM Center)", "Halte 9 (FPIPS Utama)"
 ]
 
 leg_durations = df_edited["Total Waktu Leg (Menit)"].tolist()
@@ -421,7 +373,7 @@ with tab3:
     st.dataframe(df_o3, use_container_width=True, hide_index=True)
 
 # ---------------------------------------------------------
-# 8. PETA INTERAKTIF 9 HALTE (TANPA GARIS RUTE)
+# 9. PETA INTERAKTIF 9 HALTE (TANPA GARIS RUTE)
 # ---------------------------------------------------------
 st.markdown("---")
 st.subheader("4️⃣ Visualisasi Peta Titik Penanda 9 Halte Tetap Kampus UPI")
@@ -429,14 +381,10 @@ st.write("Peta di bawah **hanya menampilkan titik penanda 9 halte (tanpa garis)*
 
 data_koordinat_awal = {
     "Nama Halte": [
-        "Halte 1: FPTI (Gedung A-D Gerbang Bawah)",
-        "Halte 2: FIP Baru (Gedung FIP Baru)",
-        "Halte 3: FPMIPA (Gedung JICA FPMIPA)",
-        "Halte 4: FPOK (Gedung FPOK Utama)",
-        "Halte 5: FK (Gedung Fakultas Kedokteran)",
-        "Halte 6: FPEB (Gedung FPEB Utama)",
-        "Halte 7: FPSD (Gedung FPSD Utama)",
-        "Halte 8: FPBS (Gedung FPBS / ATM Center)",
+        "Halte 1: FPTI (Gedung A-D Gerbang Bawah)", "Halte 2: FIP Baru (Gedung FIP Baru)",
+        "Halte 3: FPMIPA (Gedung JICA FPMIPA)", "Halte 4: FPOK (Gedung FPOK Utama)",
+        "Halte 5: FK (Gedung Fakultas Kedokteran)", "Halte 6: FPEB (Gedung FPEB Utama)",
+        "Halte 7: FPSD (Gedung FPSD Utama)", "Halte 8: FPBS (Gedung FPBS / ATM Center)",
         "Halte 9: FPIPS (Gedung FPIPS Utama)"
     ],
     "Latitude": [-6.8637, -6.8617, -6.8620, -6.8610, -6.8608, -6.8603, -6.8602, -6.8606, -6.8613],
