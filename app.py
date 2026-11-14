@@ -3,6 +3,7 @@ import pandas as pd
 import folium
 from streamlit_folium import st_folium
 import datetime
+import streamlit.components.v1 as components
 
 # ---------------------------------------------------------
 # 1. KONFIGURASI DASHBOARD
@@ -22,7 +23,6 @@ st.markdown("---")
 # ---------------------------------------------------------
 st.sidebar.header("⚙️ Panel Parameter Simulator")
 
-# Parameter Kecepatan & Dwell Time
 kecepatan_kmjam = st.sidebar.slider(
     "Kecepatan Rata-Rata Odong-Odong (km/jam):", 
     min_value=10, 
@@ -145,7 +145,7 @@ st.markdown(f"ℹ️ **Kapasitas Armada**: Ditetapkan maksimal **{kapasitas_maks
 st.markdown("---")
 
 # ---------------------------------------------------------
-# 5. ANIMASI PERGERAKAN 2 TITIK (TITIK ASAL -> TITIK TUJUAN)
+# 5. ANIMASI PERGERAKAN 2 TITIK (MENGGUNAKAN COMPONENTS.HTML)
 # ---------------------------------------------------------
 st.subheader("🎬 Visualisasi Animasi Pergerakan Odong-Odong (Titik A -> Titik B)")
 st.write("Pilih ruas perjalanan (leg) di bawah untuk melihat animasi pergerakan mobil odong-odong meluncur & bergoyang dari halte asal ke halte tujuan:")
@@ -186,35 +186,44 @@ jarak_leg = df_edited.iloc[pilihan_leg_anim]["Estimasi Jarak (Meter)"]
 waktu_jalan_leg = df_edited.iloc[pilihan_leg_anim]["Waktu Jalan (Menit)"]
 
 html_anim_code = f"""
+<!DOCTYPE html>
+<html>
+<head>
 <style>
 @keyframes moveAndShake {{
     0% {{
-        left: 5%;
+        left: 2%;
         transform: translateY(0px) rotate(0deg);
     }}
     25% {{
-        transform: translateY(-4px) rotate(-2deg);
+        transform: translateY(-4px) rotate(-3deg);
     }}
     50% {{
-        transform: translateY(3px) rotate(2deg);
+        transform: translateY(3px) rotate(3deg);
     }}
     75% {{
-        transform: translateY(-3px) rotate(-1deg);
+        transform: translateY(-3px) rotate(-2deg);
     }}
     100% {{
-        left: 80%;
+        left: 88%;
         transform: translateY(0px) rotate(0deg);
     }}
+}}
+
+body {{
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }}
 
 .anim-container {{
     background: linear-gradient(135deg, #1e293b, #0f172a);
     border-radius: 16px;
-    padding: 24px;
+    padding: 20px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     color: white;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-bottom: 20px;
+    border: 1px solid #334155;
 }}
 
 .nodes-wrapper {{
@@ -226,12 +235,11 @@ html_anim_code = f"""
 
 .node-box {{
     background: #334155;
-    padding: 12px 20px;
+    padding: 10px 16px;
     border-radius: 12px;
     border: 2px solid #38bdf8;
     font-weight: bold;
-    font-size: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-size: 14px;
     width: 38%;
     text-align: center;
 }}
@@ -241,14 +249,14 @@ html_anim_code = f"""
     height: 12px;
     background: #475569;
     border-radius: 6px;
-    margin: 35px 10px;
+    margin: 35px 10px 15px 10px;
     border: 1px dashed #94a3b8;
 }}
 
 .car-icon {{
     position: absolute;
-    top: -24px;
-    font-size: 36px;
+    top: -26px;
+    font-size: 34px;
     animation: moveAndShake 3.5s infinite linear;
     filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4));
 }}
@@ -256,27 +264,27 @@ html_anim_code = f"""
 .info-badge {{
     text-align: center;
     background: #0284c7;
-    padding: 8px 16px;
+    padding: 6px 14px;
     border-radius: 20px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    margin-top: 10px;
     display: inline-block;
 }}
 </style>
-
+</head>
+<body>
 <div class="anim-container">
     <div class="nodes-wrapper">
         <div class="node-box">
             📍 TITIK ASAL<br>
-            <span style="color: #38bdf8; font-size: 16px;">{nama_asal}</span>
+            <span style="color: #38bdf8; font-size: 15px;">{nama_asal}</span>
         </div>
         <div style="text-align: center;">
             <span class="info-badge">📏 {jarak_leg} Meter | ⏱️ {waktu_jalan_leg} Menit</span>
         </div>
         <div class="node-box">
             🏁 TITIK TUJUAN<br>
-            <span style="color: #4ade80; font-size: 16px;">{nama_tujuan}</span>
+            <span style="color: #4ade80; font-size: 15px;">{nama_tujuan}</span>
         </div>
     </div>
     
@@ -284,9 +292,12 @@ html_anim_code = f"""
         <div class="car-icon">🚌</div>
     </div>
 </div>
+</body>
+</html>
 """
 
-st.markdown(html_anim_code, unsafe_allow_html=True)
+# Memanggil komponen HTML resmi Streamlit agar animasi berjalan sempurna
+components.html(html_anim_code, height=210)
 st.markdown("---")
 
 # ---------------------------------------------------------
