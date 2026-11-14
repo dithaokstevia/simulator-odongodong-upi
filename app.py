@@ -259,7 +259,7 @@ st.markdown("---")
 # ---------------------------------------------------------
 # 7. ANIMASI PERGERAKAN 3 TITIK (MENGIKUTI INPUT SUPIR IN SIDEBAR)
 # ---------------------------------------------------------
-st.subheader("🎬 Visualisasi Animasi Pergerakan 3 Armada Odong-Odong (Titik A -> Titik B)")
+st.subheader("Status Pergerakan 3 Armada Odong-Odong")
 st.write("Tampilan animasi di bawah **secara otomatis bergerak sesuai posisi Leg Perjalanan yang diinput supir di Panel Sidebar**:")
 
 def render_anim_odong_direct(pilihan_leg_anim, border_color):
