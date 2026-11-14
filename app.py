@@ -127,17 +127,7 @@ leg_list = [
     "Leg 9: Halte 9 (FPIPS Utama) -> Halte 1 (FPTI Gerbang Bawah)"
 ]
 
-jarak_list_baru = [
-    320,  # FPTI - FIP
-    120,  # FIP - FPMIPA
-    327,  # FPMIPA - FPOK
-    120,  # FPOK - FK
-    150,  # FK - FPEB
-    130,  # FPEB - FPSD
-    160,  # FPSD - FPBS
-    230,  # FPBS - FPIPS
-    180   # FPIPS - FPTI
-]
+jarak_list_baru = [320, 120, 327, 120, 150, 130, 160, 230, 180]
 
 data_jarak = {
     "Leg Rute Lingkar Kampus": leg_list,
@@ -192,7 +182,6 @@ with m_col1:
         st.error("⚠️ STATUS: KABIN PENUH SAAT INI")
     else:
         st.success(f"✅ STATUS: TERSEDIA {sisa_o1} KURSI LANGSUNG")
-    
     st.markdown("**📍 Rincian Penumpang Akan Turun di Halte:**")
     df_t1 = pd.DataFrame([{"Halte Tujuan": k, "Jumlah Turun (Orang)": v} for k, v in turun_o1.items() if v > 0])
     if not df_t1.empty:
@@ -208,7 +197,6 @@ with m_col2:
         st.error("⚠️ STATUS: KABIN PENUH SAAT INI")
     else:
         st.success(f"✅ STATUS: TERSEDIA {sisa_o2} KURSI LANGSUNG")
-    
     st.markdown("**📍 Rincian Penumpang Akan Turun di Halte:**")
     df_t2 = pd.DataFrame([{"Halte Tujuan": k, "Jumlah Turun (Orang)": v} for k, v in turun_o2.items() if v > 0])
     if not df_t2.empty:
@@ -224,7 +212,6 @@ with m_col3:
         st.error("⚠️ STATUS: KABIN PENUH SAAT INI")
     else:
         st.success(f"✅ STATUS: TERSEDIA {sisa_o3} KURSI LANGSUNG")
-    
     st.markdown("**📍 Rincian Penumpang Akan Turun di Halte:**")
     df_t3 = pd.DataFrame([{"Halte Tujuan": k, "Jumlah Turun (Orang)": v} for k, v in turun_o3.items() if v > 0])
     if not df_t3.empty:
@@ -235,10 +222,10 @@ with m_col3:
 st.markdown("---")
 
 # ---------------------------------------------------------
-# 7. ANIMASI PERGERAKAN 2 TITIK (COMPONENTS.HTML)
+# 7. ANIMASI PERGERAKAN 3 TITIK (ODONG 1, ODONG 2, ODONG 3)
 # ---------------------------------------------------------
-st.subheader("🎬 Visualisasi Animasi Pergerakan Odong-Odong (Titik A -> Titik B)")
-st.write("Pilih ruas perjalanan (leg) di bawah untuk melihat animasi pergerakan mobil odong-odong meluncur & bergoyang dari halte asal ke halte tujuan:")
+st.subheader("🎬 Visualisasi Animasi Pergerakan 3 Armada Odong-Odong (Titik A -> Titik B)")
+st.write("Pilih tab di bawah untuk melihat pergerakan live dari Titik Halte Asal ke Titik Halte Tujuan masing-masing Odong-Odong:")
 
 halte_asal_list = [
     "Halte 1: FPTI (Gerbang Bawah)", "Halte 2: FIP Baru", "Halte 3: FPMIPA (JICA)",
@@ -252,53 +239,70 @@ halte_tujuan_list = [
     "Halte 8: FPBS (ATM Center)", "Halte 9: FPIPS Utama", "Halte 1: FPTI (Gerbang Bawah)"
 ]
 
-pilihan_leg_anim = st.selectbox(
-    "Pilih Leg Perjalanan yang Ingin Dilihat Animasi Pergerakannya:", 
-    options=list(range(9)), 
-    format_func=lambda x: f"Leg {x+1}: {halte_asal_list[x]} -> {halte_tujuan_list[x]}"
-)
+def render_anim_odong(odong_label, default_leg_idx, border_color):
+    pilihan_leg_anim = st.selectbox(
+        f"Pilih Leg Perjalanan {odong_label}:", 
+        options=list(range(9)), 
+        index=default_leg_idx,
+        format_func=lambda x: f"Leg {x+1}: {halte_asal_list[x]} -> {halte_tujuan_list[x]}",
+        key=f"select_leg_{odong_label}"
+    )
 
-nama_asal = halte_asal_list[pilihan_leg_anim]
-nama_tujuan = halte_tujuan_list[pilihan_leg_anim]
-jarak_leg = df_edited.iloc[pilihan_leg_anim]["Estimasi Jarak (Meter)"]
-waktu_jalan_leg = df_edited.iloc[pilihan_leg_anim]["Waktu Jalan (Menit)"]
+    nama_asal = halte_asal_list[pilihan_leg_anim]
+    nama_tujuan = halte_tujuan_list[pilihan_leg_anim]
+    jarak_leg = df_edited.iloc[pilihan_leg_anim]["Estimasi Jarak (Meter)"]
+    waktu_jalan_leg = df_edited.iloc[pilihan_leg_anim]["Waktu Jalan (Menit)"]
 
-html_anim_code = f"""
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-@keyframes moveAndShake {{
-    0% {{ left: 2%; transform: translateY(0px) rotate(0deg); }}
-    25% {{ transform: translateY(-4px) rotate(-3deg); }}
-    50% {{ transform: translateY(3px) rotate(3deg); }}
-    75% {{ transform: translateY(-3px) rotate(-2deg); }}
-    100% {{ left: 88%; transform: translateY(0px) rotate(0deg); }}
-}}
-
-body {{ margin: 0; padding: 0; background: transparent; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }}
-.anim-container {{ background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 16px; padding: 20px; color: white; border: 1px solid #334155; }}
-.nodes-wrapper {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }}
-.node-box {{ background: #334155; padding: 10px 16px; border-radius: 12px; border: 2px solid #38bdf8; font-weight: bold; font-size: 14px; width: 38%; text-align: center; }}
-.track-line {{ position: relative; height: 12px; background: #475569; border-radius: 6px; margin: 35px 10px 15px 10px; border: 1px dashed #94a3b8; }}
-.car-icon {{ position: absolute; top: -26px; font-size: 34px; animation: moveAndShake 3.5s infinite linear; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4)); }}
-.info-badge {{ text-align: center; background: #0284c7; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-block; }}
-</style>
-</head>
-<body>
-<div class="anim-container">
-    <div class="nodes-wrapper">
-        <div class="node-box">📍 TITIK ASAL<br><span style="color: #38bdf8; font-size: 15px;">{nama_asal}</span></div>
-        <div style="text-align: center;"><span class="info-badge">📏 {jarak_leg} Meter | ⏱️ {waktu_jalan_leg} Menit</span></div>
-        <div class="node-box">🏁 TITIK TUJUAN<br><span style="color: #4ade80; font-size: 15px;">{nama_tujuan}</span></div>
+    html_code = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <style>
+    @keyframes moveAndShake {{
+        0% {{ left: 2%; transform: translateY(0px) rotate(0deg); }}
+        25% {{ transform: translateY(-4px) rotate(-3deg); }}
+        50% {{ transform: translateY(3px) rotate(3deg); }}
+        75% {{ transform: translateY(-3px) rotate(-2deg); }}
+        100% {{ left: 88%; transform: translateY(0px) rotate(0deg); }}
+    }}
+    body {{ margin: 0; padding: 0; background: transparent; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }}
+    .anim-container {{ background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 16px; padding: 20px; color: white; border: 2px solid {border_color}; }}
+    .nodes-wrapper {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }}
+    .node-box {{ background: #334155; padding: 10px 16px; border-radius: 12px; border: 2px solid {border_color}; font-weight: bold; font-size: 14px; width: 38%; text-align: center; }}
+    .track-line {{ position: relative; height: 12px; background: #475569; border-radius: 6px; margin: 35px 10px 15px 10px; border: 1px dashed #94a3b8; }}
+    .car-icon {{ position: absolute; top: -26px; font-size: 34px; animation: moveAndShake 3.5s infinite linear; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4)); }}
+    .info-badge {{ text-align: center; background: #0284c7; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-block; }}
+    </style>
+    </head>
+    <body>
+    <div class="anim-container">
+        <div class="nodes-wrapper">
+            <div class="node-box">📍 TITIK ASAL<br><span style="color: #38bdf8; font-size: 15px;">{nama_asal}</span></div>
+            <div style="text-align: center;"><span class="info-badge">📏 {jarak_leg} Meter | ⏱️ {waktu_jalan_leg} Menit</span></div>
+            <div class="node-box">🏁 TITIK TUJUAN<br><span style="color: #4ade80; font-size: 15px;">{nama_tujuan}</span></div>
+        </div>
+        <div class="track-line"><div class="car-icon">🚌</div></div>
     </div>
-    <div class="track-line"><div class="car-icon">🚌</div></div>
-</div>
-</body>
-</html>
-"""
+    </body>
+    </html>
+    """
+    components.html(html_code, height=210)
 
-components.html(html_anim_code, height=210)
+anim_tab1, anim_tab2, anim_tab3 = st.tabs([
+    "🚌 Animasi Odong 1 (Start: FPTI)",
+    "🚌 Animasi Odong 2 (Start: FPMIPA)",
+    "🚌 Animasi Odong 3 (Start: FPEB)"
+])
+
+with anim_tab1:
+    render_anim_odong("Odong_1", 0, "#38bdf8")
+
+with anim_tab2:
+    render_anim_odong("Odong_2", 2, "#f59e0b")
+
+with anim_tab3:
+    render_anim_odong("Odong_3", 5, "#10b981")
+
 st.markdown("---")
 
 # ---------------------------------------------------------
