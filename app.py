@@ -71,10 +71,24 @@ if t_selesai_dt < t_mulai_dt:
 else:
     durasi_sesi_menit = (t_selesai_dt - t_mulai_dt).total_seconds() / 60.0
 
-st.sidebar.info("💡 **Petunjuk**: Ubah jam operasional atau jarak leg di bawah untuk memperbarui jadwal secara otomatis.")
+# ---------------------------------------------------------
+# 3. PANEL PENGURUS/SUPIR: INPUT STATUS KETERISIAN KURSI
+# ---------------------------------------------------------
+st.sidebar.markdown("---")
+st.sidebar.header("👨‍✈️ Panel Pengurus / Supir (Input Kursi)")
+
+terisi_o1 = st.sidebar.number_input("Odong 1 - Kursi Terisi:", min_value=0, max_value=kapasitas_maks, value=6, step=1)
+terisi_o2 = st.sidebar.number_input("Odong 2 - Kursi Terisi:", min_value=0, max_value=kapasitas_maks, value=9, step=1)
+terisi_o3 = st.sidebar.number_input("Odong 3 - Kursi Terisi:", min_value=0, max_value=kapasitas_maks, value=3, step=1)
+
+sisa_o1 = kapasitas_maks - terisi_o1
+sisa_o2 = kapasitas_maks - terisi_o2
+sisa_o3 = kapasitas_maks - terisi_o3
+
+st.sidebar.info("💡 **Petunjuk**: Pengurus/supir dapat mengubah angka 'Kursi Terisi' di sidebar untuk memperbarui tampilan keterisian di layar secara live.")
 
 # ---------------------------------------------------------
-# 3. TABEL MATRIKS JARAK DINAMIS (9 LEG)
+# 4. TABEL MATRIKS JARAK DINAMIS (9 LEG)
 # ---------------------------------------------------------
 st.subheader("1️⃣ Matriks Jarak Antar-Halte Tetap 9 Fakultas Utama (Dapat Diedit)")
 
@@ -111,7 +125,7 @@ df_jarak = pd.DataFrame(data_jarak)
 df_edited = st.data_editor(df_jarak, num_rows="fixed", use_container_width=True, key="editor_jarak_clean")
 
 # ---------------------------------------------------------
-# 4. ENGINE KALKULASI MATEMATIKA PVRTP
+# 5. ENGINE KALKULASI MATEMATIKA PVRTP & DASHBOARD KURSI
 # ---------------------------------------------------------
 kecepatan_m_min = (kecepatan_kmjam * 1000) / 60.0
 df_edited["Waktu Jalan (Menit)"] = (df_edited["Estimasi Jarak (Meter)"] / kecepatan_m_min).round(2)
@@ -141,11 +155,41 @@ with col4:
 with col5:
     st.metric("Total Putaran Sesi", f"{total_putaran_sesi:.2f} Putaran")
 
-st.markdown(f"ℹ️ **Kapasitas Armada**: Ditetapkan maksimal **{kapasitas_maks} Orang Penumpang** per odong-odong.")
+# TAMPILAN STATUS KETERISIAN KURSI ARMADA REAL-TIME
+st.markdown("### 💺 Status Keterisian Kursi Armada Real-Time (Input Pengurus / Supir)")
+m_col1, m_col2, m_col3 = st.columns(3)
+
+with m_col1:
+    st.subheader("🚌 Odong 1 (Start: FPTI)")
+    st.metric("Kursi Terisi", f"{terisi_o1} / {kapasitas_maks} Orang", delta=f"Sisa {sisa_o1} Kursi Kosong")
+    st.progress(terisi_o1 / kapasitas_maks)
+    if terisi_o1 >= kapasitas_maks:
+        st.error("⚠️ STATUS: KURSI PENUH (100%)")
+    else:
+        st.success(f"✅ STATUS: TERSEDIA {sisa_o1} KURSI")
+
+with m_col2:
+    st.subheader("🚌 Odong 2 (Start: FPMIPA)")
+    st.metric("Kursi Terisi", f"{terisi_o2} / {kapasitas_maks} Orang", delta=f"Sisa {sisa_o2} Kursi Kosong")
+    st.progress(terisi_o2 / kapasitas_maks)
+    if terisi_o2 >= kapasitas_maks:
+        st.error("⚠️ STATUS: KURSI PENUH (100%)")
+    else:
+        st.success(f"✅ STATUS: TERSEDIA {sisa_o2} KURSI")
+
+with m_col3:
+    st.subheader("🚌 Odong 3 (Start: FPEB)")
+    st.metric("Kursi Terisi", f"{terisi_o3} / {kapasitas_maks} Orang", delta=f"Sisa {sisa_o3} Kursi Kosong")
+    st.progress(terisi_o3 / kapasitas_maks)
+    if terisi_o3 >= kapasitas_maks:
+        st.error("⚠️ STATUS: KURSI PENUH (100%)")
+    else:
+        st.success(f"✅ STATUS: TERSEDIA {sisa_o3} KURSI")
+
 st.markdown("---")
 
 # ---------------------------------------------------------
-# 5. ANIMASI PERGERAKAN 2 TITIK (MENGGUNAKAN COMPONENTS.HTML)
+# 6. ANIMASI PERGERAKAN 2 TITIK (COMPONENTS.HTML)
 # ---------------------------------------------------------
 st.subheader("🎬 Visualisasi Animasi Pergerakan Odong-Odong (Titik A -> Titik B)")
 st.write("Pilih ruas perjalanan (leg) di bawah untuk melihat animasi pergerakan mobil odong-odong meluncur & bergoyang dari halte asal ke halte tujuan:")
@@ -296,12 +340,11 @@ body {{
 </html>
 """
 
-# Memanggil komponen HTML resmi Streamlit agar animasi berjalan sempurna
 components.html(html_anim_code, height=210)
 st.markdown("---")
 
 # ---------------------------------------------------------
-# 6. TABEL JADWAL PRESISI WAKTU KEDATANGAN
+# 7. TABEL JADWAL PRESISI WAKTU KEDATANGAN
 # ---------------------------------------------------------
 st.subheader("3️⃣ Tabel Jadwal Presisi Kedatangan di Setiap Halte (Timetable Dinamis Sesi)")
 
@@ -378,7 +421,7 @@ with tab3:
     st.dataframe(df_o3, use_container_width=True, hide_index=True)
 
 # ---------------------------------------------------------
-# 7. PETA INTERAKTIF 9 HALTE (TANPA GARIS RUTE)
+# 8. PETA INTERAKTIF 9 HALTE (TANPA GARIS RUTE)
 # ---------------------------------------------------------
 st.markdown("---")
 st.subheader("4️⃣ Visualisasi Peta Titik Penanda 9 Halte Tetap Kampus UPI")
