@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import pandas as pd
 import folium
@@ -145,9 +146,156 @@ st.markdown(f"ℹ️ **Kapasitas Armada**: Ditetapkan maksimal **{kapasitas_maks
 st.markdown("---")
 
 # ---------------------------------------------------------
-# 5. TABEL JADWAL PRESISI WAKTU KEDATANGAN
+# 5. ANIMASI PERGERAKAN 2 TITIK (TITIK ASAL -> TITIK TUJUAN)
 # ---------------------------------------------------------
-st.subheader("2️⃣ Tabel Jadwal Presisi Kedatangan di Setiap Halte (Timetable Dinamis Sesi)")
+st.subheader("🎬 Visualisasi Animasi Pergerakan Odong-Odong (Titik A -> Titik B)")
+st.write("Pilih ruas perjalanan (leg) di bawah untuk melihat animasi pergerakan mobil odong-odong meluncur & bergoyang dari halte asal ke halte tujuan:")
+
+# Data Nama Halte Asal dan Tujuan
+halte_asal_list = [
+    "Halte 1: FPTI (Gerbang Bawah)",
+    "Halte 2: FIP Baru",
+    "Halte 3: FPMIPA (JICA)",
+    "Halte 4: FPOK Utama",
+    "Halte 5: FK (Kedokteran)",
+    "Halte 6: FPEB Utama",
+    "Halte 7: FPSD Utama",
+    "Halte 8: FPBS (ATM Center)",
+    "Halte 9: FPIPS Utama"
+]
+
+halte_tujuan_list = [
+    "Halte 2: FIP Baru",
+    "Halte 3: FPMIPA (JICA)",
+    "Halte 4: FPOK Utama",
+    "Halte 5: FK (Kedokteran)",
+    "Halte 6: FPEB Utama",
+    "Halte 7: FPSD Utama",
+    "Halte 8: FPBS (ATM Center)",
+    "Halte 9: FPIPS Utama",
+    "Halte 1: FPTI (Gerbang Bawah)"
+]
+
+pilihan_leg_anim = st.selectbox(
+    "Pilih Leg Perjalanan yang Ingin Dilihat Animasi Pergerakannya:", 
+    options=list(range(9)), 
+    format_func=lambda x: f"Leg {x+1}: {halte_asal_list[x]} ➔ {halte_tujuan_list[x]}"
+)
+
+nama_asal = halte_asal_list[pilihan_leg_anim]
+nama_tujuan = halte_tujuan_list[pilihan_leg_anim]
+jarak_leg = df_edited.iloc[pilihan_leg_anim]["Estimasi Jarak (Meter)"]
+waktu_jalan_leg = df_edited.iloc[pilihan_leg_anim]["Waktu Jalan (Menit)"]
+
+# Render HTML/CSS Animation Component
+html_anim_code = f"""
+<style>
+@keyframes moveAndShake {{
+    0% {{
+        left: 5%;
+        transform: translateY(0px) rotate(0deg);
+    }}
+    25% {{
+        transform: translateY(-4px) rotate(-2deg);
+    }}
+    50% {{
+        transform: translateY(3px) rotate(2deg);
+    }}
+    75% {{
+        transform: translateY(-3px) rotate(-1deg);
+    }}
+    100% {{
+        left: 80%;
+        transform: translateY(0px) rotate(0deg);
+    }}
+}}
+
+.anim-container {{
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 20px;
+}}
+
+.nodes-wrapper {{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}}
+
+.node-box {{
+    background: #334155;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 2px solid #38bdf8;
+    font-weight: bold;
+    font-size: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    width: 38%;
+    text-align: center;
+}}
+
+.track-line {{
+    position: relative;
+    height: 12px;
+    background: #475569;
+    border-radius: 6px;
+    margin: 35px 10px;
+    border: 1px dashed #94a3b8;
+}}
+
+.car-icon {{
+    position: absolute;
+    top: -24px;
+    font-size: 36px;
+    animation: moveAndShake 3.5s infinite linear;
+    filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4));
+}}
+
+.info-badge {{
+    text-align: center;
+    background: #0284c7;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 10px;
+    display: inline-block;
+}}
+</style>
+
+<div class="anim-container">
+    <div class="nodes-wrapper">
+        <div class="node-box">
+            📍 TITIK ASAL<br>
+            <span style="color: #38bdf8; font-size: 16px;">{nama_asal}</span>
+        </div>
+        <div style="text-align: center;">
+            <span class="info-badge">📏 {jarak_leg} Meter | ⏱️ {waktu_jalan_leg} Menit</span>
+        </div>
+        <div class="node-box">
+            🏁 TITIK TUJUAN<br>
+            <span style="color: #4ade80; font-size: 16px;">{nama_tujuan}</span>
+        </div>
+    </div>
+    
+    <div class="track-line">
+        <div class="car-icon">🚌</div>
+    </div>
+</div>
+"""
+
+st.markdown(html_anim_code, unsafe_allow_html=True)
+st.markdown("---")
+
+# ---------------------------------------------------------
+# 6. TABEL JADWAL PRESISI WAKTU KEDATANGAN
+# ---------------------------------------------------------
+st.subheader("3️⃣ Tabel Jadwal Presisi Kedatangan di Setiap Halte (Timetable Dinamis Sesi)")
 
 halte_names = [
     "Halte 1 (FPTI - Gerbang Bawah)",
@@ -222,11 +370,11 @@ with tab3:
     st.dataframe(df_o3, use_container_width=True, hide_index=True)
 
 # ---------------------------------------------------------
-# 6. PETA INTERAKTIF (TANPA GARIS) & SIMULASI LIVE
+# 7. PETA INTERAKTIF 9 HALTE (TANPA GARIS RUTE)
 # ---------------------------------------------------------
 st.markdown("---")
-st.subheader("3️⃣ Visualisasi Peta Titik 9 Halte & Simulasi Pergerakan Odong-Odong")
-st.write("Peta di bawah **hanya menampilkan titik penanda halte (tanpa garis)**. Gunakan slider simulasi di bawah untuk melihat posisi armada berjalan secara live:")
+st.subheader("4️⃣ Visualisasi Peta Titik Penanda 9 Halte Tetap Kampus UPI")
+st.write("Peta di bawah **hanya menampilkan titik penanda 9 halte (tanpa garis)**:")
 
 data_koordinat_awal = {
     "Nama Halte": [
@@ -248,14 +396,6 @@ data_koordinat_awal = {
 df_coords = pd.DataFrame(data_koordinat_awal)
 df_coords_edited = st.data_editor(df_coords, num_rows="fixed", use_container_width=True, key="editor_coords_clean")
 
-menit_simulasi = st.slider(
-    "🎬 **Slider Simulasi Waktu Pergerakan (Menit Sejak Jam Mulai Sesi)**:", 
-    min_value=0, 
-    max_value=max(int(durasi_sesi_menit), 30), 
-    value=0, 
-    step=1
-)
-
 tile_url = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 
 m = folium.Map(
@@ -274,16 +414,6 @@ for index, row in df_coords_edited.iterrows():
         popup=row["Nama Halte"],
         tooltip=row["Nama Halte"],
         icon=folium.Icon(color=row["Warna Icon"], icon="bus", prefix="fa")
-    ).add_to(m)
-
-if total_siklus_menit > 0:
-    h_idx1 = int((menit_simulasi / total_siklus_menit * 9)) % 9
-    pos1 = [df_coords_edited.iloc[h_idx1]["Latitude"], df_coords_edited.iloc[h_idx1]["Longitude"]]
-    folium.Marker(
-        location=pos1,
-        popup=f"🚌 Odong 1 (Posisi Menit Ke-{menit_simulasi})",
-        tooltip=f"Odong 1 di {df_coords_edited.iloc[h_idx1]['Nama Halte']}",
-        icon=folium.Icon(color="red", icon="play", prefix="fa")
     ).add_to(m)
 
 st_folium(m, width=1100, height=550)
