@@ -75,7 +75,7 @@ else:
     durasi_sesi_menit = (t_selesai_dt - t_mulai_dt).total_seconds() / 60.0
 
 # ---------------------------------------------------------
-# 3. PANEL SUPIR: INPUT POSISI LEG, KURSI TERISI & HALTE TURUN
+# 3. PANEL SUPIR: INPUT POSISI LEG, KURSI TERISI & HALTE TURUN WITH VALIDATION
 # ---------------------------------------------------------
 st.sidebar.markdown("---")
 st.sidebar.header("👨‍✈️ Panel Supir: Input Real-Time")
@@ -93,8 +93,12 @@ terisi_o1 = st.sidebar.number_input("Kursi Terisi Saat Ini (Odong 1):", 0, kapas
 turun_o1 = {}
 with st.sidebar.expander("📍 Rincian Halte Turun Penumpang (Odong 1)"):
     for idx, h_short in enumerate(list_halte):
-        def_val = 3 if h_short == "FPMIPA" else (2 if h_short == "FPEB" else 0)
+        def_val = 5 if h_short == "FPMIPA" else (5 if h_short == "FPEB" else 0)
         turun_o1[h_short] = st.number_input(f"Turun di {h_short}:", 0, terisi_o1, def_val, key=f"turun_o1_{idx}")
+
+total_turun_o1 = sum(turun_o1.values())
+if total_turun_o1 != terisi_o1:
+    st.sidebar.warning(f"⚠️ Total turun Odong 1 ({total_turun_o1} org) != Kursi terisi ({terisi_o1} org)")
 
 # Input Supir Odong 2
 st.sidebar.subheader("🚌 Odong 2 (Start: FPMIPA)")
@@ -109,8 +113,12 @@ terisi_o2 = st.sidebar.number_input("Kursi Terisi Saat Ini (Odong 2):", 0, kapas
 turun_o2 = {}
 with st.sidebar.expander("📍 Rincian Halte Turun Penumpang (Odong 2)"):
     for idx, h_short in enumerate(list_halte):
-        def_val = 4 if h_short == "FK" else 0
+        def_val = 8 if h_short == "FK" else 0
         turun_o2[h_short] = st.number_input(f"Turun di {h_short}:", 0, terisi_o2, def_val, key=f"turun_o2_{idx}")
+
+total_turun_o2 = sum(turun_o2.values())
+if total_turun_o2 != terisi_o2:
+    st.sidebar.warning(f"⚠️ Total turun Odong 2 ({total_turun_o2} org) != Kursi terisi ({terisi_o2} org)")
 
 # Input Supir Odong 3
 st.sidebar.subheader("🚌 Odong 3 (Start: FPEB)")
@@ -125,8 +133,12 @@ terisi_o3 = st.sidebar.number_input("Kursi Terisi Saat Ini (Odong 3):", 0, kapas
 turun_o3 = {}
 with st.sidebar.expander("📍 Rincian Halte Turun Penumpang (Odong 3)"):
     for idx, h_short in enumerate(list_halte):
-        def_val = 2 if h_short == "FPTI" else 0
+        def_val = 4 if h_short == "FPTI" else 0
         turun_o3[h_short] = st.number_input(f"Turun di {h_short}:", 0, terisi_o3, def_val, key=f"turun_o3_{idx}")
+
+total_turun_o3 = sum(turun_o3.values())
+if total_turun_o3 != terisi_o3:
+    st.sidebar.warning(f"⚠️ Total turun Odong 3 ({total_turun_o3} org) != Kursi terisi ({terisi_o3} org)")
 
 sisa_o1 = kapasitas_maks - terisi_o1
 sisa_o2 = kapasitas_maks - terisi_o2
@@ -180,7 +192,7 @@ with col5:
     st.metric("Total Putaran Sesi", f"{total_putaran_sesi:.2f} Putaran")
 
 # ---------------------------------------------------------
-# 6. STATUS KETERISIAN KURSI & RINCIAN TURUN PER HALTE
+# 6. STATUS KETERISIAN KURSI & RINCIAN TURUN PER HALTE (DENGAN VALIDASI)
 # ---------------------------------------------------------
 st.markdown("### 💺 Status Keterisian Kursi & Rincian Penumpang Turun per Halte")
 m_col1, m_col2, m_col3 = st.columns(3)
@@ -193,12 +205,16 @@ with m_col1:
         st.error("⚠️ STATUS: KABIN PENUH SAAT INI")
     else:
         st.success(f"✅ STATUS: TERSEDIA {sisa_o1} KURSI LANGSUNG")
+    
     st.markdown("**📍 Rincian Penumpang Akan Turun di Halte:**")
-    df_t1 = pd.DataFrame([{"Halte Tujuan": k, "Jumlah Turun (Orang)": v} for k, v in turun_o1.items() if v > 0])
-    if not df_t1.empty:
-        st.dataframe(df_t1, use_container_width=True, hide_index=True)
+    if total_turun_o1 != terisi_o1:
+        st.warning(f"⚠️ Total input turun ({total_turun_o1} org) BELUM SAMA dengan Kursi Terisi ({terisi_o1} org)! Silakan supir sesuaikan rincian.")
     else:
-        st.caption("Belum ada rincian halte turun diinput supir.")
+        df_t1 = pd.DataFrame([{"Halte Tujuan": k, "Jumlah Turun (Orang)": v} for k, v in turun_o1.items() if v > 0])
+        if not df_t1.empty:
+            st.dataframe(df_t1, use_container_width=True, hide_index=True)
+        else:
+            st.caption("Belum ada rincian halte turun diinput supir.")
 
 with m_col2:
     st.subheader("🚌 Odong 2 (Start: FPMIPA)")
@@ -208,12 +224,16 @@ with m_col2:
         st.error("⚠️ STATUS: KABIN PENUH SAAT INI")
     else:
         st.success(f"✅ STATUS: TERSEDIA {sisa_o2} KURSI LANGSUNG")
+    
     st.markdown("**📍 Rincian Penumpang Akan Turun di Halte:**")
-    df_t2 = pd.DataFrame([{"Halte Tujuan": k, "Jumlah Turun (Orang)": v} for k, v in turun_o2.items() if v > 0])
-    if not df_t2.empty:
-        st.dataframe(df_t2, use_container_width=True, hide_index=True)
+    if total_turun_o2 != terisi_o2:
+        st.warning(f"⚠️ Total input turun ({total_turun_o2} org) BELUM SAMA dengan Kursi Terisi ({terisi_o2} org)! Silakan supir sesuaikan rincian.")
     else:
-        st.caption("Belum ada rincian halte turun diinput supir.")
+        df_t2 = pd.DataFrame([{"Halte Tujuan": k, "Jumlah Turun (Orang)": v} for k, v in turun_o2.items() if v > 0])
+        if not df_t2.empty:
+            st.dataframe(df_t2, use_container_width=True, hide_index=True)
+        else:
+            st.caption("Belum ada rincian halte turun diinput supir.")
 
 with m_col3:
     st.subheader("🚌 Odong 3 (Start: FPEB)")
@@ -223,12 +243,16 @@ with m_col3:
         st.error("⚠️ STATUS: KABIN PENUH SAAT INI")
     else:
         st.success(f"✅ STATUS: TERSEDIA {sisa_o3} KURSI LANGSUNG")
+    
     st.markdown("**📍 Rincian Penumpang Akan Turun di Halte:**")
-    df_t3 = pd.DataFrame([{"Halte Tujuan": k, "Jumlah Turun (Orang)": v} for k, v in turun_o3.items() if v > 0])
-    if not df_t3.empty:
-        st.dataframe(df_t3, use_container_width=True, hide_index=True)
+    if total_turun_o3 != terisi_o3:
+        st.warning(f"⚠️ Total input turun ({total_turun_o3} org) BELUM SAMA dengan Kursi Terisi ({terisi_o3} org)! Silakan supir sesuaikan rincian.")
     else:
-        st.caption("Belum ada rincian halte turun diinput supir.")
+        df_t3 = pd.DataFrame([{"Halte Tujuan": k, "Jumlah Turun (Orang)": v} for k, v in turun_o3.items() if v > 0])
+        if not df_t3.empty:
+            st.dataframe(df_t3, use_container_width=True, hide_index=True)
+        else:
+            st.caption("Belum ada rincian halte turun diinput supir.")
 
 st.markdown("---")
 
