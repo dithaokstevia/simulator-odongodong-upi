@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 st.title("🚌 Simulator Parametrik Rute & Penjadwalan Odong-Odong UPI")
-st.caption("Kelompok 6 - Proyek MSTR Kampus UPI Silihwangi 2026 (Presisi 9 Halte & Sesi Operasional Dinamis)")
+st.caption("Kelompok 6 - Ditha Okstevia, Eisha Karima Fidareini, Nailah Amani Nuryaman, Nesa Dwi Rizqi Marsha Reneta- Proyek MSTR Kampus UPI Silihwangi 2026 (Presisi 9 Halte & Sesi Operasional Dinamis)")
 st.markdown("---")
 
 # ---------------------------------------------------------
@@ -113,18 +113,18 @@ sisa_o3 = kapasitas_maks - terisi_o3
 # ---------------------------------------------------------
 # 4. TABEL MATRIKS JARAK DINAMIS (9 LEG)
 # ---------------------------------------------------------
-st.subheader("1️⃣ Matriks Jarak Antar-Halte Tetap 9 Fakultas Utama (Dapat Diedit)")
+st.subheader("1️⃣ Matriks Jarak Antar-Halte Tetap 9 Fakultas Utama")
 
 leg_list = [
-    "Leg 1: Halte 1 (FPTI Gerbang Bawah) -> Halte 2 (FIP Baru)",
-    "Leg 2: Halte 2 (FIP Baru) -> Halte 3 (FPMIPA JICA)",
-    "Leg 3: Halte 3 (FPMIPA JICA) -> Halte 4 (FPOK Utama)",
-    "Leg 4: Halte 4 (FPOK Utama) -> Halte 5 (FK Kedokteran)",
-    "Leg 5: Halte 5 (FK Kedokteran) -> Halte 6 (FPEB Utama)",
-    "Leg 6: Halte 6 (FPEB Utama) -> Halte 7 (FPSD Utama)",
-    "Leg 7: Halte 7 (FPSD Utama) -> Halte 8 (FPBS / ATM Center)",
-    "Leg 8: Halte 8 (FPBS / ATM Center) -> Halte 9 (FPIPS Utama)",
-    "Leg 9: Halte 9 (FPIPS Utama) -> Halte 1 (FPTI Gerbang Bawah)"
+    "Leg 1: Halte 1 (FPTI) -> Halte 2 (FIP)",
+    "Leg 2: Halte 2 (FIP) -> Halte 3 (FPMIPA)",
+    "Leg 3: Halte 3 (FPMIPA) -> Halte 4 (FPOK)",
+    "Leg 4: Halte 4 (FPOK) -> Halte 5 (FK)",
+    "Leg 5: Halte 5 (FK) -> Halte 6 (FPEB)",
+    "Leg 6: Halte 6 (FPEB) -> Halte 7 (FPSD)",
+    "Leg 7: Halte 7 (FPSD) -> Halte 8 (FPBS)",
+    "Leg 8: Halte 8 (FPBS) -> Halte 9 (FPIPS)",
+    "Leg 9: Halte 9 (FPIPS) -> Halte 1 (FPTI)"
 ]
 
 jarak_list_baru = [320, 120, 327, 120, 150, 130, 160, 230, 180]
@@ -311,9 +311,9 @@ st.markdown("---")
 st.subheader("3️⃣ Tabel Jadwal Presisi Kedatangan di Setiap Halte (Timetable Dinamis Sesi)")
 
 halte_names = [
-    "Halte 1 (FPTI - Gerbang Bawah)", "Halte 2 (FIP Baru)", "Halte 3 (FPMIPA - JICA)",
-    "Halte 4 (FPOK Utama)", "Halte 5 (FK Kedokteran)", "Halte 6 (FPEB Utama)",
-    "Halte 7 (FPSD Utama)", "Halte 8 (FPBS / ATM Center)", "Halte 9 (FPIPS Utama)"
+    "Halte 1 (FPTI)", "Halte 2 (FIP)", "Halte 3 (FPMIPA)",
+    "Halte 4 (FPOK)", "Halte 5 (FK)", "Halte 6 (FPEB)",
+    "Halte 7 (FPSD)", "Halte 8 (FPBS)", "Halte 9 (FPIPS)"
 ]
 
 leg_durations = df_edited["Total Waktu Leg (Menit)"].tolist()
@@ -385,11 +385,11 @@ st.write("Peta di bawah **hanya menampilkan titik penanda 9 halte (tanpa garis)*
 
 data_koordinat_awal = {
     "Nama Halte": [
-        "Halte 1: FPTI (Gedung A-D Gerbang Bawah)", "Halte 2: FIP Baru (Gedung FIP Baru)",
-        "Halte 3: FPMIPA (Gedung JICA FPMIPA)", "Halte 4: FPOK (Gedung FPOK Utama)",
-        "Halte 5: FK (Gedung Fakultas Kedokteran)", "Halte 6: FPEB (Gedung FPEB Utama)",
-        "Halte 7: FPSD (Gedung FPSD Utama)", "Halte 8: FPBS (Gedung FPBS / ATM Center)",
-        "Halte 9: FPIPS (Gedung FPIPS Utama)"
+        "Halte 1: FPTI", "Halte 2: FIP Baru",
+        "Halte 3: FPMIPA", "Halte 4: FPOK",
+        "Halte 5: FK", "Halte 6: FPEB",
+        "Halte 7: FPSD", "Halte 8: FPBS",
+        "Halte 9: FPIPS"
     ],
     "Latitude": [-6.8637, -6.8617, -6.8620, -6.8610, -6.8608, -6.8603, -6.8602, -6.8606, -6.8613],
     "Longitude": [107.5925, 107.5911, 107.5904, 107.5900, 107.5912, 107.5925, 107.5933, 107.5940, 107.5927],
