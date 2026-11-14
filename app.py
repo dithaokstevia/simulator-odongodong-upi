@@ -1,4 +1,3 @@
-```python
 import streamlit as st
 import pandas as pd
 import folium
@@ -151,7 +150,6 @@ st.markdown("---")
 st.subheader("🎬 Visualisasi Animasi Pergerakan Odong-Odong (Titik A -> Titik B)")
 st.write("Pilih ruas perjalanan (leg) di bawah untuk melihat animasi pergerakan mobil odong-odong meluncur & bergoyang dari halte asal ke halte tujuan:")
 
-# Data Nama Halte Asal dan Tujuan
 halte_asal_list = [
     "Halte 1: FPTI (Gerbang Bawah)",
     "Halte 2: FIP Baru",
@@ -179,7 +177,7 @@ halte_tujuan_list = [
 pilihan_leg_anim = st.selectbox(
     "Pilih Leg Perjalanan yang Ingin Dilihat Animasi Pergerakannya:", 
     options=list(range(9)), 
-    format_func=lambda x: f"Leg {x+1}: {halte_asal_list[x]} ➔ {halte_tujuan_list[x]}"
+    format_func=lambda x: f"Leg {x+1}: {halte_asal_list[x]} -> {halte_tujuan_list[x]}"
 )
 
 nama_asal = halte_asal_list[pilihan_leg_anim]
@@ -187,7 +185,6 @@ nama_tujuan = halte_tujuan_list[pilihan_leg_anim]
 jarak_leg = df_edited.iloc[pilihan_leg_anim]["Estimasi Jarak (Meter)"]
 waktu_jalan_leg = df_edited.iloc[pilihan_leg_anim]["Waktu Jalan (Menit)"]
 
-# Render HTML/CSS Animation Component
 html_anim_code = f"""
 <style>
 @keyframes moveAndShake {{
