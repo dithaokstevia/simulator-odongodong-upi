@@ -1,79 +1,3 @@
-{
-  "result":  "Successfully wrote to /workspace/scratch/test_new_logic.py"
-}
-```Tool response for execute_command:
-```json
-{
-  "result":  "exit_code: 0\nstdout:\nTotal distance: 1747 m\nTotal travel time: 6.99 min\nTotal dwell time (9 haltes * 3 min): 27 min\nTotal T_siklus: 33.99 min (~34.0 min)\nHeadway (3 armadas): 11.33 min (~11.3 min)\nAverage wait: 5.66 min (~5.7 min)\nMax wait: 11.33 min (~11.3 min)\n\nSesi Pagi (06.30 - 08.00, 90 min):\nTotal putaran yang dapat diselesaikan: 2.6 putaran (2 putaran penuh + partial)\nSesi Sore (16.00 - 16.30, 30 min):\nTotal putaran yang dapat diselesaikan: 0.9 putaran\n\nstderr:\nOpenBLAS WARNING - could not determine the L2 cache size on this system, assuming 256k\n/usr/local/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.2.0)/charset_normalizer (3.5.1) doesn't match a supported version!\n  warnings.warn(\n"
-}
-```Tool response for write_to_file:
-```json
-{
-  "result":  "Successfully wrote to /workspace/scratch/verify_app_code.py"
-}
-```Tool response for execute_command:
-```json
-{
-  "result":  "exit_code: 0\nstdout:\nAST validation passed cleanly! Code is 100% valid Python syntax.\n\nstderr:\n"
-}
-```Tool response for execute_command:
-```json
-{
-  "result":  "exit_code: 0\nstdout:\nExecution test passed cleanly!\nDataframe shapes: (9, 2), (9, 4)\nTimetable test len: 14\n\nstderr:\nOpenBLAS WARNING - could not determine the L2 cache size on this system, assuming 256k\n/usr/local/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.2.0)/charset_normalizer (3.5.1) doesn't match a supported version!\n  warnings.warn(\n"
-}
-```Tool response for write_to_file: <empty>Tool response for execute_command:
-```json
-{
-  "result":  "Successfully wrote to /workspace/scratch/update_doc_v21.py"
-}
-```Tool response for execute_command:
-```json
-{
-  "result":  "exit_code: 0\nstdout:\nUpdated report document v21 saved successfully!\n\nstderr:\n"
-}
-```Tool response for execute_command:
-```json
-{
-  "result":  "exit_code: 0\nstdout:\n\nstderr:\n\n[Synced] laporan_proyek_mstr_kelompok_6.docx artifactId=1276a1cd-17ef-4ee2-bb3a-a1b7fe544521 servingUrl=[suspicious link removed]"
-}
-```Semua perubahan parameter operasional, penyesuaian matriks rute baru, pengaturan jam sesi dinamis, hingga fitur simulasi pergerakan posisi odong-odong di peta telah **selesai dibuat dan diuji 100% bebas dari error syntax**.
-
----
-
-### **💡 Rincian Pembaruan pada Simulator & Kode Python:**
-
-1. **Parameter Slider Kecepatan & Dwell Time Baru**:
-   * **Batas Kecepatan**: Minimal **10 km/jam** dan Maksimal **25 km/jam** (default: 15 km/jam).
-   * **Waktu Henti di Halte (*Dwell Time*)**: Default **3 menit** per halte.
-
-2. **Matriks 9 Jarak Leg Baru (Total Rute = 1.747 Meter / 1,75 km)**:
-   * **Halte 1 (FPTI) ➔ Halte 2 (FIP Baru)**: `320 m`
-   * **Halte 2 (FIP Baru) ➔ Halte 3 (FPMIPA)**: `120 m`
-   * **Halte 3 (FPMIPA) ➔ Halte 4 (FPOK)**: `327 m`
-   * **Halte 4 (FPOK) ➔ Halte 5 (FK)**: `120 m`
-   * **Halte 5 (FK) ➔ Halte 6 (FPEB)**: `150 m`
-   * **Halte 6 (FPEB) ➔ Halte 7 (FPSD)**: `130 m`
-   * **Halte 7 (FPSD) ➔ Halte 8 (FPBS)**: `160 m`
-   * **Halte 8 (FPBS) ➔ Halte 9 (FPIPS)**: `230 m`
-   * **Halte 9 (FPIPS) ➔ Halte 1 (FPTI)**: `180 m`
-
-3. **Visualisasi Peta & Kapasitas Penumpang**:
-   * **Peta Bersih Tanpa Garis**: Garis biru (`PolyLine`) telah dihapus sehingga peta **hanya menampilkan titik penanda halte (marker)** sesuai permintaan Anda.
-   * **Kapasitas Armada**: Ditambahkan *metric box* yang menampilkan **Kapasitas Maksimum = 10 Penumpang / Armada**.
-
-4. **Animasi Pergerakan Odong-Odong di Peta (*Live Simulation*)**:
-   * **Bisa!** Disediakan modul **Simulasi Pergerakan Posisi Odong-Odong**. Anda dapat menggeser *slider* menit operasional (misal menit ke-0, menit ke-5, menit ke-15) untuk melihat penanda posisi bus bergerak secara *live* dari halte ke halte pada jam operasional yang berlangsung.
-
-5. **Manajemen Parameter Sesi Dinamis & Kalkulasi Total Putaran**:
-   * **Pengaturan Jam Mulai & Selesai**: Terdapat pemilih waktu (*Time Picker*) untuk menentukan jam mulai dan jam selesai operasional secara bebas (misal Sesi Pagi: 06.30 - 08.00 WIB = 90 menit; Sesi Sore: 16.00 - 16.30 WIB = 30 menit).
-   * **Hitungan Total Durasi & Putaran**: Simulator secara otomatis mengalkulasi berapa **Total Durasi Sesi (Menit)** dan berapa **Total Putaran (Siklus)** yang dapat diselesaikan oleh odong-odong dalam sesi tersebut (misal pada kecepatan 15 km/jam & dwell time 3 menit, 1 siklus putar memakan waktu ~34 menit; sehingga Sesi Pagi 90 menit menghasilkan **2,65 putaran**).
-   * **Timetable Kedatangan Presisi**: Tabel jadwal kedatangan jam dan menit secara otomatis membatasi urutan *trip* hanya pada rentang jam operasional sesi yang sedang dipilih.
-
----
-
-### **🚀 Kode Utuh `app.py` Terbaru (Silakan Salin & Timpa di GitHub)**
-
-```python
 import streamlit as st
 import pandas as pd
 import folium
@@ -98,7 +22,7 @@ st.markdown("---")
 # ---------------------------------------------------------
 st.sidebar.header("⚙️ Panel Parameter Simulator")
 
-# Parameter Kecepatan & Dwell Time Baru
+# Parameter Kecepatan & Dwell Time
 kecepatan_kmjam = st.sidebar.slider(
     "Kecepatan Rata-Rata Odong-Odong (km/jam):", 
     min_value=10, 
@@ -115,8 +39,8 @@ dwell_time = st.sidebar.number_input(
     step=1
 )
 
-jumlah_armada = 3  # Fixed 3 Armada
-kapasitas_maks = 10 # Maksimal 10 penumpang per unit
+jumlah_armada = 3
+kapasitas_maks = 10
 
 st.sidebar.markdown("---")
 st.sidebar.header("🕒 Pengaturan Jam Operasional Sesi")
@@ -126,7 +50,6 @@ pilihan_sesi = st.sidebar.selectbox(
     ["Sesi Pagi (Utama)", "Sesi Sore (Kepulangan)", "Sesi Kustom (Bebas)"]
 )
 
-# Pengaturan Jam Mulai & Jam Selesai Sesi
 if "Pagi" in pilihan_sesi:
     default_start = datetime.time(6, 30)
     default_end = datetime.time(8, 0)
@@ -140,35 +63,33 @@ else:
 jam_mulai_sesi = st.sidebar.time_input("Jam Mulai Operasional Sesi:", default_start)
 jam_selesai_sesi = st.sidebar.time_input("Jam Selesai Operasional Sesi:", default_end)
 
-# Hitung Durasi Operasional Sesi (Menit)
 t_mulai_dt = datetime.datetime.combine(datetime.date.today(), jam_mulai_sesi)
 t_selesai_dt = datetime.datetime.combine(datetime.date.today(), jam_selesai_sesi)
 
 if t_selesai_dt < t_mulai_dt:
-    durasi_sesi_menit = 0
+    durasi_sesi_menit = 0.0
 else:
     durasi_sesi_menit = (t_selesai_dt - t_mulai_dt).total_seconds() / 60.0
 
-st.sidebar.info("💡 **Petunjuk**: Anda dapat mengubah jam mulai, jam selesai, atau mengedit jarak leg pada tabel di bawah untuk melihat pembaruan jadwal dan total putaran secara otomatis.")
+st.sidebar.info("💡 **Petunjuk**: Ubah jam operasional atau jarak leg di bawah untuk memperbarui jadwal secara otomatis.")
 
 # ---------------------------------------------------------
-# 3. TABEL MATRIKS JARAK DINAMIS (9 LEG BARU)
+# 3. TABEL MATRIKS JARAK DINAMIS (9 LEG)
 # ---------------------------------------------------------
 st.subheader("1️⃣ Matriks Jarak Antar-Halte Tetap 9 Fakultas Utama (Dapat Diedit)")
 
 leg_list = [
-    "Leg 1: Halte 1 (FPTI Gerbang Bawah) ➔ Halte 2 (FIP Baru)",
-    "Leg 2: Halte 2 (FIP Baru) ➔ Halte 3 (FPMIPA JICA)",
-    "Leg 3: Halte 3 (FPMIPA JICA) ➔ Halte 4 (FPOK Utama)",
-    "Leg 4: Halte 4 (FPOK Utama) ➔ Halte 5 (FK Kedokteran)",
-    "Leg 5: Halte 5 (FK Kedokteran) ➔ Halte 6 (FPEB Utama)",
-    "Leg 6: Halte 6 (FPEB Utama) ➔ Halte 7 (FPSD Utama)",
-    "Leg 7: Halte 7 (FPSD Utama) ➔ Halte 8 (FPBS / ATM Center)",
-    "Leg 8: Halte 8 (FPBS / ATM Center) ➔ Halte 9 (FPIPS Utama)",
-    "Leg 9: Halte 9 (FPIPS Utama) ➔ Halte 1 (FPTI Gerbang Bawah)"
+    "Leg 1: Halte 1 (FPTI Gerbang Bawah) -> Halte 2 (FIP Baru)",
+    "Leg 2: Halte 2 (FIP Baru) -> Halte 3 (FPMIPA JICA)",
+    "Leg 3: Halte 3 (FPMIPA JICA) -> Halte 4 (FPOK Utama)",
+    "Leg 4: Halte 4 (FPOK Utama) -> Halte 5 (FK Kedokteran)",
+    "Leg 5: Halte 5 (FK Kedokteran) -> Halte 6 (FPEB Utama)",
+    "Leg 6: Halte 6 (FPEB Utama) -> Halte 7 (FPSD Utama)",
+    "Leg 7: Halte 7 (FPSD Utama) -> Halte 8 (FPBS / ATM Center)",
+    "Leg 8: Halte 8 (FPBS / ATM Center) -> Halte 9 (FPIPS Utama)",
+    "Leg 9: Halte 9 (FPIPS Utama) -> Halte 1 (FPTI Gerbang Bawah)"
 ]
 
-# Matriks Jarak Baru Sesuai Permintaan
 jarak_list_baru = [
     320,  # FPTI - FIP
     120,  # FIP - FPMIPA
@@ -187,10 +108,10 @@ data_jarak = {
 }
 
 df_jarak = pd.DataFrame(data_jarak)
-df_edited = st.data_editor(df_jarak, num_rows="fixed", use_container_width=True, key="editor_jarak_baru")
+df_edited = st.data_editor(df_jarak, num_rows="fixed", use_container_width=True, key="editor_jarak_clean")
 
 # ---------------------------------------------------------
-# 4. ENGINE KALKULASI MATEMATIKA PVRTP & PUTARAN SESI
+# 4. ENGINE KALKULASI MATEMATIKA PVRTP
 # ---------------------------------------------------------
 kecepatan_m_min = (kecepatan_kmjam * 1000) / 60.0
 df_edited["Waktu Jalan (Menit)"] = (df_edited["Estimasi Jarak (Meter)"] / kecepatan_m_min).round(2)
@@ -201,7 +122,6 @@ headway_menit = total_siklus_menit / jumlah_armada
 waktu_tunggu_rata = headway_menit / 2.0
 waktu_tunggu_maks = headway_menit
 
-# Hitung Total Putaran Sesi
 if total_siklus_menit > 0 and durasi_sesi_menit > 0:
     total_putaran_sesi = durasi_sesi_menit / total_siklus_menit
 else:
@@ -225,7 +145,7 @@ st.markdown(f"ℹ️ **Kapasitas Armada**: Ditetapkan maksimal **{kapasitas_maks
 st.markdown("---")
 
 # ---------------------------------------------------------
-# 5. TABEL JADWAL PRESISI WAKTU KEDATANGAN (BERDASARKAN SESI)
+# 5. TABEL JADWAL PRESISI WAKTU KEDATANGAN
 # ---------------------------------------------------------
 st.subheader("2️⃣ Tabel Jadwal Presisi Kedatangan di Setiap Halte (Timetable Dinamis Sesi)")
 
@@ -275,7 +195,7 @@ def build_timetable_sesi(start_halte_idx, start_dt, end_dt):
             })
         
         trip_count += 1
-        if trip_count > 10:  # Batas aman pembacaan trip
+        if trip_count > 10:
             break
             
     return pd.DataFrame(rows)
@@ -302,7 +222,7 @@ with tab3:
     st.dataframe(df_o3, use_container_width=True, hide_index=True)
 
 # ---------------------------------------------------------
-# 6. PETA INTERAKTIF (TANPA GARIS) & SIMULASI PERGERAKAN LIVE
+# 6. PETA INTERAKTIF (TANPA GARIS) & SIMULASI LIVE
 # ---------------------------------------------------------
 st.markdown("---")
 st.subheader("3️⃣ Visualisasi Peta Titik 9 Halte & Simulasi Pergerakan Odong-Odong")
@@ -328,7 +248,6 @@ data_koordinat_awal = {
 df_coords = pd.DataFrame(data_koordinat_awal)
 df_coords_edited = st.data_editor(df_coords, num_rows="fixed", use_container_width=True, key="editor_coords_clean")
 
-# Slider Simulasi Menit Pergerakan Live
 menit_simulasi = st.slider(
     "🎬 **Slider Simulasi Waktu Pergerakan (Menit Sejak Jam Mulai Sesi)**:", 
     min_value=0, 
@@ -337,7 +256,6 @@ menit_simulasi = st.slider(
     step=1
 )
 
-# Server Direct OpenStreetMap (Bebas Watermark & API Key)
 tile_url = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 
 m = folium.Map(
@@ -349,7 +267,6 @@ m = folium.Map(
 
 folium.LatLngPopup().add_to(m)
 
-# Menampilkan Titik Halte (Tanpa Garis Rute)
 for index, row in df_coords_edited.iterrows():
     pos = [float(row["Latitude"]), float(row["Longitude"])]
     folium.Marker(
@@ -359,9 +276,7 @@ for index, row in df_coords_edited.iterrows():
         icon=folium.Icon(color=row["Warna Icon"], icon="bus", prefix="fa")
     ).add_to(m)
 
-# Simulasi Posisi Odong-Odong Berjalan di Peta
 if total_siklus_menit > 0:
-    # Posisi Halte Odong 1
     h_idx1 = int((menit_simulasi / total_siklus_menit * 9)) % 9
     pos1 = [df_coords_edited.iloc[h_idx1]["Latitude"], df_coords_edited.iloc[h_idx1]["Longitude"]]
     folium.Marker(
