@@ -34,6 +34,10 @@ kecepatan_kmjam = st.sidebar.slider(
     step=1
 )
 
+# KONVERSI REAL-TIME KE METER/MENIT (FITUR BARU)
+kecepatan_m_min_display = (kecepatan_kmjam * 1000) / 60.0
+st.sidebar.markdown(f"⚡ **Kecepatan Konversi:** `{kecepatan_m_min_display:.2f} m/menit` ({kecepatan_m_min_display:.1f} meter per menit)")
+
 dwell_time = st.sidebar.number_input(
     "Waktu Henti di Halte / Dwell Time (Menit):", 
     min_value=1, 
