@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 st.title("🚌 Simulator Parametrik Rute & Penjadwalan Odong-Odong UPI")
-st.caption("Kelompok 6 - Ditha Okstevia, Eisha Karima Fidareini, Nailah Amani Nuryaman, Nesa Dwi Rizqi Marsha Reneta, Wafa Nidaul Hasanah - Proyek MSTR Kampus UPI Silihwangi 2026 (Presisi 9 Halte & Sesi Operasional Dinamis)")
+st.caption("Kelompok 6 - Ditha Okstevia, Eisha Karima Fidareini, Nailah Amani Nuryaman, Nesa Dwi Rizqi Marsha Reneta, Wafa Nidaul Hasanah - Proyek MSTR Kampus UPI Bumi Siliwangi 2026")
 st.markdown("---")
 
 # Data Nama 9 Halte Singkat Presisi
